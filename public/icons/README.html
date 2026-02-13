@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NoteFlow - Icon Generator</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #0a0a0f;
+      color: white;
+    }
+    h1 { color: #9333ea; }
+    .instructions {
+      background: rgba(255,255,255,0.05);
+      padding: 20px;
+      border-radius: 12px;
+      margin: 20px 0;
+    }
+    code {
+      background: rgba(255,255,255,0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+    }
+    a { color: #c026d3; }
+  </style>
+</head>
+<body>
+  <h1>NoteFlow Icon Setup</h1>
+  
+  <div class="instructions">
+    <h2>To generate PWA icons:</h2>
+    <ol>
+      <li>Go to <a href="https://favicon.io/favicon-converter/" target="_blank">favicon.io</a> or <a href="https://www.pwabuilder.com/imageGenerator" target="_blank">PWA Builder Image Generator</a></li>
+      <li>Upload the <code>icon.svg</code> file from <code>public/icons/</code></li>
+      <li>Download the generated icons</li>
+      <li>Place them in the <code>public/icons/</code> folder with these names:
+        <ul>
+          <li>icon-72x72.png</li>
+          <li>icon-96x96.png</li>
+          <li>icon-128x128.png</li>
+          <li>icon-144x144.png</li>
+          <li>icon-152x152.png</li>
+          <li>icon-192x192.png</li>
+          <li>icon-384x384.png</li>
+          <li>icon-512x512.png</li>
+        </ul>
+      </li>
+    </ol>
+    
+    <h3>Or use ImageMagick (if installed):</h3>
+    <code>
+      cd public/icons<br>
+      for size in 72 96 128 144 152 192 384 512; do<br>
+      &nbsp;&nbsp;convert icon.svg -resize ${size}x${size} icon-${size}x${size}.png<br>
+      done
+    </code>
+  </div>
+  
+  <div class="instructions">
+    <h2>PWA Features Enabled:</h2>
+    <ul>
+      <li>✅ Installable on mobile devices</li>
+      <li>✅ Works offline</li>
+      <li>✅ Add to home screen</li>
+      <li>✅ Splash screen</li>
+      <li>✅ Standalone mode (no browser UI)</li>
+      <li>✅ Background sync</li>
+      <li>✅ Push notifications ready</li>
+    </ul>
+  </div>
+</body>
+</html>
