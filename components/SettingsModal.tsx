@@ -16,9 +16,11 @@ import {
   FileJson,
   Check,
   Settings2,
-  ChevronRight
+  ChevronRight,
+  Sparkles
 } from 'lucide-react';
 import { useNotes } from '@/context/NotesContext';
+import { useInsights } from '@/context/InsightsContext';
 import { useState, useEffect } from 'react';
 
 interface SettingsModalProps {
@@ -28,6 +30,7 @@ interface SettingsModalProps {
 
 export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   const { notes, stats } = useNotes();
+  const { insightsEnabled, setInsightsEnabled } = useInsights();
   const [activeTab, setActiveTab] = useState<'general' | 'data' | 'shortcuts'>('general');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [fontSize, setFontSize] = useState<'small' | 'medium' | 'large'>('medium');
@@ -253,6 +256,32 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                       >
                         <motion.div
                           animate={{ x: animationsEnabled ? 24 : 4 }}
+                          className="absolute top-1 w-4 h-4 rounded-full bg-white"
+                        />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Smart Insights */}
+                  <div className="bg-white/[0.02] rounded-xl p-5 border border-white/[0.06]">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-pink-500/10 flex items-center justify-center">
+                          <Sparkles className="w-5 h-5 text-pink-400" />
+                        </div>
+                        <div>
+                          <h3 className="text-white font-medium">Smart Insights</h3>
+                          <p className="text-white/40 text-sm">AI-powered taglines and quotes based on your notes</p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => setInsightsEnabled(!insightsEnabled)}
+                        className={`w-12 h-6 rounded-full transition-colors relative ${
+                          insightsEnabled ? 'bg-purple-600' : 'bg-white/10'
+                        }`}
+                      >
+                        <motion.div
+                          animate={{ x: insightsEnabled ? 24 : 4 }}
                           className="absolute top-1 w-4 h-4 rounded-full bg-white"
                         />
                       </button>

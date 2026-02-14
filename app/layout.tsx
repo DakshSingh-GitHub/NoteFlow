@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans } from 'next/font/google'
 import './globals.css'
 import { NotesProvider } from '@/context/NotesContext'
 import { NotificationProvider } from '@/context/NotificationContext'
+import { InsightsProvider } from '@/context/InsightsContext'
 
 const plusJakarta = Plus_Jakarta_Sans({ 
   subsets: ['latin'],
@@ -67,9 +68,11 @@ export default function RootLayout({
       </head>
       <body className={`${plusJakarta.className} touch-manipulation`}>
         <NotesProvider>
-          <NotificationProvider>
-            {children}
-          </NotificationProvider>
+          <InsightsProvider>
+            <NotificationProvider>
+              {children}
+            </NotificationProvider>
+          </InsightsProvider>
         </NotesProvider>
       </body>
     </html>

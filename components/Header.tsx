@@ -1,9 +1,10 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Bell, Menu } from 'lucide-react';
+import { Search, Bell, Menu, Sparkles } from 'lucide-react';
 import { useNotes } from '@/context/NotesContext';
 import { useNotifications } from '@/context/NotificationContext';
+import { useInsights } from '@/context/InsightsContext';
 import { useState, useEffect } from 'react';
 
 interface HeaderProps {
@@ -15,6 +16,7 @@ interface HeaderProps {
 export default function Header({ onMenuClick, isMobileMenuOpen, onNotificationClick }: HeaderProps) {
   const { filters, setFilters, stats } = useNotes();
   const { unreadCount, todayEvents } = useNotifications();
+  const { insightsEnabled, currentInsight } = useInsights();
   const [searchValue, setSearchValue] = useState(filters.searchQuery);
   const [greeting, setGreeting] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -86,7 +88,18 @@ export default function Header({ onMenuClick, isMobileMenuOpen, onNotificationCl
               transition={{ delay: 0.1 }}
               className="text-white/40 text-sm truncate"
             >
-              {greeting} • {stats.total - stats.archived} notes
+              {insightsEnabled && currentInsight ? (
+                <span className="flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-pink-400" />
+                  <span className="text-pink-300/80">{currentInsight.tagline}</span>
+                  <span className="mx-1.5">•</span>
+                  <span>{stats.total - stats.archived} notes</span>
+                </span>
+              ) : (
+                <>
+                  {greeting} • {stats.total - stats.archived} notes
+                </>
+              )}
               {todayEvents.length > 0 && (
                 <span className="ml-2 text-purple-400">
                   • {todayEvents.length} event{todayEvents.length > 1 ? 's' : ''} today

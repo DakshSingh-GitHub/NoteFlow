@@ -1,8 +1,9 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { FileX, Sparkles, Search } from 'lucide-react';
+import { FileX, Sparkles, Search, Quote } from 'lucide-react';
 import { useNotes } from '@/context/NotesContext';
+import { useInsights } from '@/context/InsightsContext';
 import { Note } from '@/types/note';
 import NoteCard from './NoteCard';
 
@@ -37,6 +38,7 @@ const itemVariants = {
 
 export default function NoteGrid({ onEdit, onView }: NoteGridProps) {
   const { filteredNotes, filters } = useNotes();
+  const { insightsEnabled, currentInsight } = useInsights();
 
   const pinnedNotes = filteredNotes.filter(n => n.isPinned);
   const unpinnedNotes = filteredNotes.filter(n => !n.isPinned);
@@ -126,6 +128,35 @@ export default function NoteGrid({ onEdit, onView }: NoteGridProps) {
             </AnimatePresence>
           </motion.div>
         </section>
+      )}
+
+      {/* Insight Quote */}
+      {insightsEnabled && currentInsight && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="mt-12 pt-8 border-t border-white/[0.06]"
+        >
+          <div className="flex flex-col items-center text-center max-w-2xl mx-auto">
+            <div className="w-10 h-10 rounded-xl bg-pink-500/10 flex items-center justify-center mb-4">
+              <Quote className="w-5 h-5 text-pink-400" />
+            </div>
+            <blockquote className="text-white/60 text-sm italic leading-relaxed">
+              "{currentInsight.quote}"
+            </blockquote>
+            <div className="mt-3 flex items-center gap-2">
+              <div className={`w-2 h-2 rounded-full ${
+                currentInsight.category === 'productivity' ? 'bg-blue-400' :
+                currentInsight.category === 'creativity' ? 'bg-purple-400' :
+                currentInsight.category === 'motivation' ? 'bg-amber-400' :
+                currentInsight.category === 'mindfulness' ? 'bg-emerald-400' :
+                'bg-pink-400'
+              }`} />
+              <span className="text-xs text-white/30 capitalize">{currentInsight.category}</span>
+            </div>
+          </div>
+        </motion.div>
       )}
     </div>
   );
