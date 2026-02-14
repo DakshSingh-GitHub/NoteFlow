@@ -51,7 +51,7 @@ export default function Header({ onMenuClick, isMobileMenuOpen, onNotificationCl
   };
 
   return (
-    <header className="sticky top-0 z-30 px-4 sm:px-6 lg:px-8 pt-10 sm:pt-6 pb-4 sm:pb-6 bg-[#0a0a0f]/70 backdrop-blur-xl border-b border-white/[0.08]">
+    <header className="sticky top-0 z-30 px-4 sm:px-6 lg:px-8 pt-5 pb-5 sm:pt-6 sm:pb-6 bg-[#0a0a0f]/70 backdrop-blur-xl border-b border-white/[0.08]">
       <div className="flex items-center justify-between gap-4">
         {/* Left Section */}
         <div className="flex items-center gap-4 flex-1 min-w-0">

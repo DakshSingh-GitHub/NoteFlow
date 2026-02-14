@@ -2,6 +2,7 @@
 
 import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
 import { Note, FilterState, CATEGORIES, NOTE_COLORS } from '@/types/note';
+import { getNotes, saveNotes } from '@/lib/indexedDB';
 
 interface NotesContextType {
   notes: Note[];
@@ -75,23 +76,42 @@ export function NotesProvider({ children }: { children: ReactNode }) {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem('notes');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      setNotes(parsed.map((n: Note) => ({
-        ...n,
-        createdAt: new Date(n.createdAt),
-        updatedAt: new Date(n.updatedAt),
-      })));
-    } else {
-      setNotes(initialNotes);
-    }
-    setIsLoaded(true);
+    const loadNotes = async () => {
+      try {
+        const saved = await getNotes();
+        if (saved && saved.length > 0) {
+          setNotes(saved.map((n) => ({
+            ...n,
+            createdAt: new Date(n.createdAt),
+            updatedAt: new Date(n.updatedAt),
+          })));
+        } else {
+          setNotes(initialNotes);
+        }
+      } catch (error) {
+        console.error('Failed to load notes from IndexedDB:', error);
+        setNotes(initialNotes);
+      }
+      setIsLoaded(true);
+    };
+    loadNotes();
   }, []);
 
   useEffect(() => {
     if (isLoaded) {
-      localStorage.setItem('notes', JSON.stringify(notes));
+      const saveToIndexedDB = async () => {
+        try {
+          const notesToSave = notes.map(n => ({
+            ...n,
+            createdAt: n.createdAt.toISOString(),
+            updatedAt: n.updatedAt.toISOString(),
+          }));
+          await saveNotes(notesToSave);
+        } catch (error) {
+          console.error('Failed to save notes to IndexedDB:', error);
+        }
+      };
+      saveToIndexedDB();
     }
   }, [notes, isLoaded]);
 
