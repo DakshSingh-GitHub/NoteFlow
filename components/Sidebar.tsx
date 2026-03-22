@@ -99,8 +99,8 @@ export default function Sidebar({ onSettingsClick, isMobileMenuOpen, onMobileMen
         <span>{label}</span>
       </div>
     ) : (
-      <div className="flex justify-center mb-2">
-        {Icon && <Icon className="w-3.5 h-3.5 text-white/25" />}
+      <div className="flex justify-center mb-3 mt-1">
+        {Icon && <Icon className="w-3.5 h-3.5 text-white/30" />}
       </div>
     );
 
@@ -117,21 +117,25 @@ export default function Sidebar({ onSettingsClick, isMobileMenuOpen, onMobileMen
       key={key}
       onClick={onClick}
       title={!isOpen ? label : undefined}
-      className={`w-full group relative rounded-xl transition-all duration-200 border ${
-        isOpen ? 'px-3.5 py-2.5' : 'px-0 py-2.5'
+      className={`w-full group relative transition-all duration-200 border ${
+        isOpen ? 'rounded-xl px-3.5 py-2.5' : 'rounded-2xl px-2 py-1.5'
       } ${
         isActive
           ? 'bg-purple-500/14 border-purple-500/25 text-purple-200'
           : 'bg-transparent border-transparent text-white/65 hover:text-white hover:bg-white/[0.04]'
       }`}
     >
-      <div className={`flex items-center ${isOpen ? 'gap-3.5' : 'justify-center'}`}>
+      <div
+        className={`flex items-center ${
+          isOpen ? 'gap-3.5' : 'justify-center mx-auto w-11 h-11 rounded-xl border border-white/[0.08] bg-white/[0.02]'
+        }`}
+      >
         {leftDot ? (
-          <span className={`w-2 h-2 rounded-full ${leftDot} flex-shrink-0`} />
+          <span className={`w-2.5 h-2.5 rounded-full ${leftDot} flex-shrink-0`} />
         ) : (
           <Icon
             className={`w-[18px] h-[18px] flex-shrink-0 ${
-              isActive ? 'text-purple-300' : 'text-white/50 group-hover:text-white/80'
+              isActive ? 'text-purple-300' : 'text-white/60 group-hover:text-white/90'
             }`}
           />
         )}
@@ -149,7 +153,7 @@ export default function Sidebar({ onSettingsClick, isMobileMenuOpen, onMobileMen
         )}
 
         {!isOpen && count > 0 && (
-          <span className="absolute -top-1 -right-1 w-4.5 h-4.5 rounded-full bg-purple-500 text-[9px] font-bold text-white border-2 border-[#0a0a0f] inline-flex items-center justify-center">
+          <span className="absolute top-0.5 right-0.5 z-20 min-w-[20px] h-5 px-1 rounded-full bg-fuchsia-500 text-[10px] font-extrabold text-white border-2 border-[#0b0b11] inline-flex items-center justify-center shadow-lg shadow-fuchsia-500/60">
             {count > 9 ? '9+' : count}
           </span>
         )}
@@ -159,8 +163,8 @@ export default function Sidebar({ onSettingsClick, isMobileMenuOpen, onMobileMen
 
   const sidebarContent = (
     <>
-      <div className="px-4 py-4 border-b border-white/[0.08]">
-        <div className={`flex items-center ${isOpen ? 'gap-3' : 'flex-col justify-center gap-3'}`}>
+      <div className={`px-4 border-b border-white/[0.08] ${isOpen ? 'py-4' : 'py-5'}`}>
+        <div className={`flex items-center ${isOpen ? 'gap-3' : 'flex-col justify-center gap-2.5'}`}>
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 via-violet-600 to-fuchsia-600 flex items-center justify-center shadow-lg shadow-purple-500/20 flex-shrink-0">
             <Sparkles className="w-5 h-5 text-white" />
           </div>
@@ -182,7 +186,7 @@ export default function Sidebar({ onSettingsClick, isMobileMenuOpen, onMobileMen
           {!isMobile && (
             <button
               onClick={() => setIsOpen((prev) => !prev)}
-              className="w-8 h-8 rounded-lg border border-white/[0.08] bg-white/[0.03] text-white/45 hover:text-white hover:bg-white/[0.08] transition-all flex-shrink-0"
+              className="w-8 h-8 rounded-lg border border-white/[0.1] bg-white/[0.05] text-white/55 hover:text-white hover:bg-white/[0.1] transition-all flex-shrink-0"
               title={isOpen ? 'Collapse sidebar' : 'Expand sidebar'}
             >
               {isOpen ? (
@@ -195,7 +199,7 @@ export default function Sidebar({ onSettingsClick, isMobileMenuOpen, onMobileMen
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 px-3 py-4 space-y-5 overflow-y-auto overflow-x-hidden">
+      <div className={`flex-1 min-h-0 px-3 py-4 overflow-y-auto overflow-x-hidden ${isOpen ? 'space-y-5' : 'space-y-6'}`}>
         {isOpen && (
           <div className="rounded-xl border border-white/[0.08] bg-gradient-to-br from-white/[0.05] to-white/[0.02] px-3.5 py-3">
             <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.1em] text-white/35 mb-2">
@@ -264,15 +268,19 @@ export default function Sidebar({ onSettingsClick, isMobileMenuOpen, onMobileMen
         </div>
       </div>
 
-      <div className="p-3 border-t border-white/[0.08] bg-[#0a0a0f]/60">
+      <div className={`p-3 border-t border-white/[0.08] bg-[#0a0a0f]/60 ${isOpen ? '' : 'pb-4'}`}>
         <button
           onClick={handleSettingsClick}
           title={!isOpen ? 'Settings' : undefined}
           className={`w-full rounded-xl transition-all duration-200 border ${
-            isOpen ? 'px-3.5 py-2.5' : 'px-0 py-2.5'
+            isOpen ? 'px-3.5 py-2.5' : 'px-2 py-1.5'
           } border-transparent text-white/65 hover:text-white hover:bg-white/[0.05]`}
         >
-          <div className={`flex items-center ${isOpen ? 'gap-3.5' : 'justify-center'}`}>
+          <div
+            className={`flex items-center ${
+              isOpen ? 'gap-3.5' : 'justify-center mx-auto w-11 h-11 rounded-xl border border-white/[0.08] bg-white/[0.02]'
+            }`}
+          >
             <Settings className="w-[18px] h-[18px] text-white/50" />
             {isOpen && <span className="text-sm font-medium">Settings</span>}
           </div>
@@ -286,7 +294,7 @@ export default function Sidebar({ onSettingsClick, isMobileMenuOpen, onMobileMen
       {!isMobile && (
         <motion.aside
           initial={false}
-          animate={{ width: isOpen ? 292 : 82 }}
+          animate={{ width: isOpen ? 292 : 92 }}
           transition={{ type: 'spring', stiffness: 220, damping: 28, mass: 0.9 }}
           className="h-screen sticky top-0 hidden lg:flex flex-col z-20 overflow-hidden bg-[#0a0a0f]/85 backdrop-blur-xl border-r border-white/[0.08]"
         >
