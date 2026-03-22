@@ -1,16 +1,18 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  LayoutDashboard, 
-  Pin, 
-  Archive, 
+import {
+  LayoutDashboard,
+  Pin,
+  Archive,
   Tag,
   Settings,
   Sparkles,
   ChevronLeft,
   ChevronRight,
-  X
+  X,
+  Layers3,
+  type LucideIcon,
 } from 'lucide-react';
 import { useNotes } from '@/context/NotesContext';
 import { CATEGORIES } from '@/types/note';
@@ -33,53 +35,55 @@ export default function Sidebar({ onSettingsClick, isMobileMenuOpen, onMobileMen
       setIsMobile(mobile);
       setIsOpen(!mobile);
     };
-    
+
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   const categoryColors: Record<string, string> = {
-    'Personal': 'bg-violet-500',
-    'Work': 'bg-blue-500',
-    'Ideas': 'bg-cyan-500',
-    'Tasks': 'bg-emerald-500',
-    'Study': 'bg-amber-500',
-    'Health': 'bg-rose-500',
-    'Finance': 'bg-green-500',
-    'Other': 'bg-slate-500',
+    Personal: 'bg-violet-500',
+    Work: 'bg-blue-500',
+    Ideas: 'bg-cyan-500',
+    Tasks: 'bg-emerald-500',
+    Study: 'bg-amber-500',
+    Health: 'bg-rose-500',
+    Finance: 'bg-green-500',
+    Other: 'bg-slate-500',
   };
 
+  const visibleCategories = CATEGORIES.filter((cat) => stats.byCategory[cat] > 0);
+
   const menuItems = [
-    { 
-      icon: LayoutDashboard, 
-      label: 'All Notes', 
+    {
+      icon: LayoutDashboard,
+      label: 'All Notes',
       count: stats.total - stats.archived,
       onClick: () => {
         setFilters({ category: null, showArchived: false, showPinned: false });
         if (isMobile) onMobileMenuClose();
       },
-      isActive: !filters.category && !filters.showArchived && !filters.showPinned
+      isActive: !filters.category && !filters.showArchived && !filters.showPinned,
     },
-    { 
-      icon: Pin, 
-      label: 'Pinned', 
+    {
+      icon: Pin,
+      label: 'Pinned',
       count: stats.pinned,
       onClick: () => {
-        setFilters({ showPinned: true, showArchived: false });
+        setFilters({ showPinned: true, showArchived: false, category: null });
         if (isMobile) onMobileMenuClose();
       },
-      isActive: filters.showPinned
+      isActive: filters.showPinned,
     },
-    { 
-      icon: Archive, 
-      label: 'Archived', 
+    {
+      icon: Archive,
+      label: 'Archived',
       count: stats.archived,
       onClick: () => {
-        setFilters({ showArchived: true, showPinned: false });
+        setFilters({ showArchived: true, showPinned: false, category: null });
         if (isMobile) onMobileMenuClose();
       },
-      isActive: filters.showArchived && !filters.showPinned
+      isActive: filters.showArchived && !filters.showPinned,
     },
   ];
 
@@ -88,190 +92,190 @@ export default function Sidebar({ onSettingsClick, isMobileMenuOpen, onMobileMen
     if (isMobile) onMobileMenuClose();
   };
 
+  const sectionLabel = (label: string, Icon?: LucideIcon) =>
+    isOpen ? (
+      <div className="px-3 mb-2 flex items-center gap-2 text-[11px] font-semibold tracking-[0.12em] uppercase text-white/35">
+        {Icon && <Icon className="w-3.5 h-3.5 text-white/35" />}
+        <span>{label}</span>
+      </div>
+    ) : (
+      <div className="flex justify-center mb-2">
+        {Icon && <Icon className="w-3.5 h-3.5 text-white/25" />}
+      </div>
+    );
+
+  const renderNavButton = (
+    key: string,
+    Icon: LucideIcon,
+    label: string,
+    count: number,
+    isActive: boolean,
+    onClick: () => void,
+    leftDot?: string
+  ) => (
+    <button
+      key={key}
+      onClick={onClick}
+      title={!isOpen ? label : undefined}
+      className={`w-full group relative rounded-xl transition-all duration-200 border ${
+        isOpen ? 'px-3.5 py-2.5' : 'px-0 py-2.5'
+      } ${
+        isActive
+          ? 'bg-purple-500/14 border-purple-500/25 text-purple-200'
+          : 'bg-transparent border-transparent text-white/65 hover:text-white hover:bg-white/[0.04]'
+      }`}
+    >
+      <div className={`flex items-center ${isOpen ? 'gap-3.5' : 'justify-center'}`}>
+        {leftDot ? (
+          <span className={`w-2 h-2 rounded-full ${leftDot} flex-shrink-0`} />
+        ) : (
+          <Icon
+            className={`w-[18px] h-[18px] flex-shrink-0 ${
+              isActive ? 'text-purple-300' : 'text-white/50 group-hover:text-white/80'
+            }`}
+          />
+        )}
+
+        {isOpen && <span className="flex-1 text-left text-sm font-medium truncate">{label}</span>}
+
+        {isOpen && count > 0 && (
+          <span
+            className={`min-w-6 h-5 px-1.5 rounded-full text-[11px] font-semibold inline-flex items-center justify-center ${
+              isActive ? 'bg-purple-500/28 text-purple-100' : 'bg-white/[0.08] text-white/55'
+            }`}
+          >
+            {count}
+          </span>
+        )}
+
+        {!isOpen && count > 0 && (
+          <span className="absolute -top-1 -right-1 w-4.5 h-4.5 rounded-full bg-purple-500 text-[9px] font-bold text-white border-2 border-[#0a0a0f] inline-flex items-center justify-center">
+            {count > 9 ? '9+' : count}
+          </span>
+        )}
+      </div>
+    </button>
+  );
+
   const sidebarContent = (
     <>
-      {/* Logo */}
-      <div className="p-5 border-b border-white/[0.08]">
-        <AnimatePresence mode="wait">
-          {isOpen ? (
-            <motion.div
-              key="logo-open"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="flex items-center gap-3"
-            >
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 via-violet-600 to-fuchsia-600 flex items-center justify-center shadow-lg shadow-purple-500/30 flex-shrink-0">
-                <Sparkles className="w-5 h-5 text-white" />
-              </div>
-              <div className="flex items-center justify-between flex-1">
-                <span className="text-lg font-bold text-white">
-                  NoteFlow
-                </span>
-                {!isMobile && (
-                  <button
-                    onClick={() => setIsOpen(false)}
-                    className="w-7 h-7 rounded-lg glass flex items-center justify-center text-white/40 hover:text-white transition-all"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
-                )}
-              </div>
-            </motion.div>
-          ) : (
-            <motion.div
-              key="logo-closed"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="flex flex-col items-center gap-3"
-            >
-              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-purple-600 via-violet-600 to-fuchsia-600 flex items-center justify-center shadow-lg shadow-purple-500/30">
-                <Sparkles className="w-5 h-5 text-white" />
-              </div>
-              {!isMobile && (
-                <button
-                  onClick={() => setIsOpen(true)}
-                  className="w-7 h-7 rounded-lg glass flex items-center justify-center text-white/40 hover:text-white transition-all"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              )}
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+      <div className="px-4 py-4 border-b border-white/[0.08]">
+        <div className={`flex items-center ${isOpen ? 'gap-3' : 'flex-col justify-center gap-3'}`}>
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 via-violet-600 to-fuchsia-600 flex items-center justify-center shadow-lg shadow-purple-500/20 flex-shrink-0">
+            <Sparkles className="w-5 h-5 text-white" />
+          </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 px-3 py-5 space-y-1 overflow-y-auto overflow-x-hidden">
-        {menuItems.map((item) => (
-          <button
-            key={item.label}
-            onClick={item.onClick}
-            className={`w-full flex items-center ${isOpen ? 'gap-3 px-3' : 'justify-center px-2'} py-2.5 rounded-xl transition-all duration-200 group relative ${
-              item.isActive 
-                ? 'bg-purple-500/15 text-purple-300 border border-purple-500/25 backdrop-blur-sm' 
-                : 'text-white/60 hover:text-white hover:bg-white/[0.04] border border-transparent'
-            }`}
-            title={!isOpen ? item.label : undefined}
-          >
-            <item.icon className={`w-5 h-5 flex-shrink-0 transition-colors ${item.isActive ? 'text-purple-400' : 'text-white/50 group-hover:text-white/70'}`} />
-            <AnimatePresence mode="wait">
-              {isOpen && (
-                <motion.span
-                  initial={{ opacity: 0, width: 0 }}
-                  animate={{ opacity: 1, width: 'auto' }}
-                  exit={{ opacity: 0, width: 0 }}
-                  transition={{ duration: 0.15 }}
-                  className="flex-1 text-left whitespace-nowrap text-sm font-medium"
-                >
-                  {item.label}
-                </motion.span>
-              )}
-            </AnimatePresence>
-            {isOpen && item.count > 0 && (
-              <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${
-                item.isActive ? 'bg-purple-500/30 text-purple-200' : 'bg-white/[0.06] text-white/50'
-              }`}>
-                {item.count}
-              </span>
-            )}
-            {!isOpen && item.count > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-purple-500 rounded-full text-[9px] flex items-center justify-center text-white font-bold border-2 border-[#0a0a0f]">
-                {item.count > 9 ? '9+' : item.count}
-              </span>
-            )}
-          </button>
-        ))}
-
-        {/* Categories */}
-        <div className="pt-6 space-y-1">
-          <AnimatePresence>
+          <AnimatePresence mode="wait">
             {isOpen && (
               <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="px-3 mb-3 text-xs font-semibold text-white/30 uppercase tracking-wider flex items-center gap-2"
+                initial={{ opacity: 0, x: -6 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -6 }}
+                className="min-w-0 flex-1"
               >
-                <Tag className="w-3.5 h-3.5" />
-                Categories
+                <p className="text-white text-lg font-bold leading-tight">NoteFlow</p>
+                <p className="text-xs text-white/45 mt-0.5">Capture. Organize. Focus.</p>
               </motion.div>
             )}
           </AnimatePresence>
-          
-          {!isOpen && (
-            <div className="flex justify-center mb-3">
-              <Tag className="w-4 h-4 text-white/30" />
-            </div>
-          )}
-          
-          {CATEGORIES.filter(cat => stats.byCategory[cat] > 0).map((category) => (
+
+          {!isMobile && (
             <button
-              key={category}
-              onClick={() => {
-                setFilters({ category, showArchived: false, showPinned: false });
-                if (isMobile) onMobileMenuClose();
-              }}
-              className={`w-full flex items-center ${isOpen ? 'gap-3 px-3' : 'justify-center px-2'} py-2.5 rounded-xl transition-all duration-200 group relative ${
-                filters.category === category
-                  ? 'bg-purple-500/15 text-purple-300 border border-purple-500/25 backdrop-blur-sm'
-                  : 'text-white/60 hover:text-white hover:bg-white/[0.04] border border-transparent'
-              }`}
-              title={!isOpen ? category : undefined}
+              onClick={() => setIsOpen((prev) => !prev)}
+              className="w-8 h-8 rounded-lg border border-white/[0.08] bg-white/[0.03] text-white/45 hover:text-white hover:bg-white/[0.08] transition-all flex-shrink-0"
+              title={isOpen ? 'Collapse sidebar' : 'Expand sidebar'}
             >
-              <div className={`w-2 h-2 rounded-full flex-shrink-0 ${categoryColors[category] || 'bg-slate-500'}`} />
-              <AnimatePresence mode="wait">
-                {isOpen && (
-                  <motion.span
-                    initial={{ opacity: 0, width: 0 }}
-                    animate={{ opacity: 1, width: 'auto' }}
-                    exit={{ opacity: 0, width: 0 }}
-                    transition={{ duration: 0.15 }}
-                    className="flex-1 text-left whitespace-nowrap text-sm font-medium"
-                  >
-                    {category}
-                  </motion.span>
-                )}
-              </AnimatePresence>
-              {isOpen && stats.byCategory[category] > 0 && (
-                <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${
-                  filters.category === category ? 'bg-purple-500/30 text-purple-200' : 'bg-white/[0.06] text-white/50'
-                }`}>
-                  {stats.byCategory[category]}
-                </span>
-              )}
-              {!isOpen && stats.byCategory[category] > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-white/20 rounded-full text-[9px] flex items-center justify-center text-white font-bold border-2 border-[#0a0a0f]">
-                  {stats.byCategory[category] > 9 ? '9+' : stats.byCategory[category]}
-                </span>
+              {isOpen ? (
+                <ChevronLeft className="w-4 h-4 mx-auto" />
+              ) : (
+                <ChevronRight className="w-4 h-4 mx-auto" />
               )}
             </button>
-          ))}
+          )}
         </div>
-      </nav>
+      </div>
 
-      {/* Footer */}
-      <div className="p-3 border-t border-white/[0.08]">
+      <div className="flex-1 min-h-0 px-3 py-4 space-y-5 overflow-y-auto overflow-x-hidden">
+        {isOpen && (
+          <div className="rounded-xl border border-white/[0.08] bg-gradient-to-br from-white/[0.05] to-white/[0.02] px-3.5 py-3">
+            <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.1em] text-white/35 mb-2">
+              <Layers3 className="w-3.5 h-3.5" />
+              Quick Stats
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              <div className="rounded-lg bg-white/[0.04] px-2.5 py-2 text-center">
+                <p className="text-white font-semibold text-sm">{stats.total - stats.archived}</p>
+                <p className="text-[10px] text-white/40 mt-0.5">Active</p>
+              </div>
+              <div className="rounded-lg bg-white/[0.04] px-2.5 py-2 text-center">
+                <p className="text-purple-300 font-semibold text-sm">{stats.pinned}</p>
+                <p className="text-[10px] text-white/40 mt-0.5">Pinned</p>
+              </div>
+              <div className="rounded-lg bg-white/[0.04] px-2.5 py-2 text-center">
+                <p className="text-blue-300 font-semibold text-sm">{stats.archived}</p>
+                <p className="text-[10px] text-white/40 mt-0.5">Archived</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div>
+          {sectionLabel('Library', LayoutDashboard)}
+          <div className="space-y-1.5">
+            {menuItems.map((item) =>
+              renderNavButton(item.label, item.icon, item.label, item.count, item.isActive, item.onClick)
+            )}
+          </div>
+        </div>
+
+        <div>
+          {sectionLabel('Categories', Tag)}
+          <div className="space-y-1.5">
+            {visibleCategories.length > 0 ? (
+              visibleCategories.map((category) =>
+                renderNavButton(
+                  category,
+                  Tag,
+                  category,
+                  stats.byCategory[category],
+                  filters.category === category,
+                  () => {
+                    setFilters({ category, showArchived: false, showPinned: false });
+                    if (isMobile) onMobileMenuClose();
+                  },
+                  categoryColors[category] || 'bg-slate-500'
+                )
+              )
+            ) : (
+              <AnimatePresence mode="wait">
+                {isOpen && (
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="text-xs text-white/35 px-3 py-2"
+                  >
+                    Categories will appear as you create notes.
+                  </motion.p>
+                )}
+              </AnimatePresence>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="p-3 border-t border-white/[0.08] bg-[#0a0a0f]/60">
         <button
           onClick={handleSettingsClick}
-          className={`w-full flex items-center ${isOpen ? 'gap-3 px-3' : 'justify-center px-2'} py-2.5 rounded-xl transition-all duration-200 group text-white/60 hover:text-white hover:bg-white/[0.04] border border-transparent`}
           title={!isOpen ? 'Settings' : undefined}
+          className={`w-full rounded-xl transition-all duration-200 border ${
+            isOpen ? 'px-3.5 py-2.5' : 'px-0 py-2.5'
+          } border-transparent text-white/65 hover:text-white hover:bg-white/[0.05]`}
         >
-          <Settings className="w-5 h-5 text-white/50 group-hover:text-white/70 flex-shrink-0" />
-          <AnimatePresence mode="wait">
-            {isOpen && (
-              <motion.span
-                initial={{ opacity: 0, width: 0 }}
-                animate={{ opacity: 1, width: 'auto' }}
-                exit={{ opacity: 0, width: 0 }}
-                transition={{ duration: 0.15 }}
-                className="text-sm font-medium whitespace-nowrap"
-              >
-                Settings
-              </motion.span>
-            )}
-          </AnimatePresence>
+          <div className={`flex items-center ${isOpen ? 'gap-3.5' : 'justify-center'}`}>
+            <Settings className="w-[18px] h-[18px] text-white/50" />
+            {isOpen && <span className="text-sm font-medium">Settings</span>}
+          </div>
         </button>
       </div>
     </>
@@ -279,47 +283,42 @@ export default function Sidebar({ onSettingsClick, isMobileMenuOpen, onMobileMen
 
   return (
     <>
-      {/* Desktop Sidebar */}
       {!isMobile && (
         <motion.aside
           initial={false}
-          animate={{ width: isOpen ? 260 : 72 }}
-          transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-          className="h-screen sticky top-0 hidden lg:flex flex-col z-20 overflow-hidden bg-[#0a0a0f]/80 backdrop-blur-xl border-r border-white/[0.08]"
+          animate={{ width: isOpen ? 292 : 82 }}
+          transition={{ type: 'spring', stiffness: 220, damping: 28, mass: 0.9 }}
+          className="h-screen sticky top-0 hidden lg:flex flex-col z-20 overflow-hidden bg-[#0a0a0f]/85 backdrop-blur-xl border-r border-white/[0.08]"
         >
           {sidebarContent}
         </motion.aside>
       )}
 
-      {/* Mobile Drawer */}
       <AnimatePresence>
         {isMobile && isMobileMenuOpen && (
           <>
-            {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={onMobileMenuClose}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+              className="fixed inset-0 bg-black/65 backdrop-blur-sm z-40 lg:hidden"
             />
-            
-            {/* Drawer */}
+
             <motion.aside
               initial={{ x: '-100%' }}
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
-              transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-              className="fixed inset-y-0 left-0 w-[280px] z-50 flex flex-col bg-[#0a0a0f]/95 backdrop-blur-xl border-r border-white/[0.08] lg:hidden"
+              transition={{ type: 'spring', stiffness: 320, damping: 30 }}
+              className="fixed inset-y-0 left-0 w-[300px] max-w-[88vw] z-50 flex flex-col bg-[#0a0a0f]/95 backdrop-blur-xl border-r border-white/[0.08] lg:hidden"
             >
-              {/* Close Button */}
               <button
                 onClick={onMobileMenuClose}
-                className="absolute top-4 right-4 w-9 h-9 rounded-xl glass flex items-center justify-center text-white/50 hover:text-white transition-all z-10"
+                className="absolute top-4 right-4 w-9 h-9 rounded-xl bg-white/[0.05] border border-white/[0.1] flex items-center justify-center text-white/60 hover:text-white transition-all z-10"
+                title="Close menu"
               >
                 <X className="w-5 h-5" />
               </button>
-              
               {sidebarContent}
             </motion.aside>
           </>

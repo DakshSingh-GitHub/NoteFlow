@@ -42,24 +42,25 @@ export default function NoteModal({ isOpen, onClose, editingNoteId }: NoteModalP
   const editingNote = editingNoteId ? notes.find((n) => n.id === editingNoteId) : null;
 
   useEffect(() => {
+    const nextContent = editingNote
+      ? normalizeContentForEditor(editingNote.content)
+      : '';
+
     if (editingNote) {
       setTitle(editingNote.title);
-      setContentHtml(normalizeContentForEditor(editingNote.content));
+      setContentHtml(nextContent);
       setCategory(editingNote.category as NoteCategory);
       setColor(editingNote.color);
     } else {
       setTitle('');
-      setContentHtml('');
+      setContentHtml(nextContent);
       setCategory(CATEGORIES[0]);
       setColor(NOTE_COLORS[Math.floor(Math.random() * NOTE_COLORS.length)].value);
     }
-  }, [editingNote, isOpen]);
-
-  useEffect(() => {
     if (isOpen && editorRef.current) {
-      editorRef.current.innerHTML = contentHtml;
+      editorRef.current.innerHTML = nextContent;
     }
-  }, [isOpen, editingNoteId]);
+  }, [editingNote, isOpen]);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
