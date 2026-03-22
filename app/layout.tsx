@@ -4,6 +4,7 @@ import './globals.css'
 import { NotesProvider } from '@/context/NotesContext'
 import { NotificationProvider } from '@/context/NotificationContext'
 import { InsightsProvider } from '@/context/InsightsContext'
+import PWARegister from './pwa-register'
 
 const plusJakarta = Plus_Jakarta_Sans({ 
   subsets: ['latin'],
@@ -67,6 +68,7 @@ export default function RootLayout({
         <link rel="shortcut icon" href="/icons/icon-32x32.png" />
       </head>
       <body className={`${plusJakarta.className} touch-manipulation`}>
+        <PWARegister />
         <NotesProvider>
           <InsightsProvider>
             <NotificationProvider>
