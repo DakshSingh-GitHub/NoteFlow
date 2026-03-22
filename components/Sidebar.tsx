@@ -1,6 +1,5 @@
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard,
   Pin,
@@ -16,7 +15,8 @@ import {
 } from 'lucide-react';
 import { useNotes } from '@/context/NotesContext';
 import { CATEGORIES } from '@/types/note';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { animate, remove } from 'animejs';
 
 interface SidebarProps {
   onSettingsClick: () => void;
@@ -27,7 +27,12 @@ interface SidebarProps {
 export default function Sidebar({ onSettingsClick, isMobileMenuOpen, onMobileMenuClose }: SidebarProps) {
   const [isOpen, setIsOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
+  const [showMobileDrawer, setShowMobileDrawer] = useState(false);
   const { filters, setFilters, stats } = useNotes();
+  const desktopSidebarRef = useRef<HTMLElement | null>(null);
+  const mobileBackdropRef = useRef<HTMLDivElement | null>(null);
+  const mobileDrawerRef = useRef<HTMLElement | null>(null);
+  const hasMountedRef = useRef(false);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -40,6 +45,82 @@ export default function Sidebar({ onSettingsClick, isMobileMenuOpen, onMobileMen
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  useEffect(() => {
+    if (isMobile || !desktopSidebarRef.current) return;
+
+    if (!hasMountedRef.current) {
+      desktopSidebarRef.current.style.width = `${isOpen ? 292 : 92}px`;
+      hasMountedRef.current = true;
+      return;
+    }
+
+    remove(desktopSidebarRef.current);
+    animate(desktopSidebarRef.current, {
+      width: `${isOpen ? 292 : 92}px`,
+      duration: 520,
+      easing: 'easeInOutQuart',
+    });
+  }, [isOpen, isMobile]);
+
+  useEffect(() => {
+    if (!isMobile) {
+      setShowMobileDrawer(false);
+      return;
+    }
+
+    if (isMobileMenuOpen) {
+      setShowMobileDrawer(true);
+      return;
+    }
+
+    if (!showMobileDrawer) return;
+
+    if (mobileBackdropRef.current) {
+      remove(mobileBackdropRef.current);
+      animate(mobileBackdropRef.current, {
+        opacity: [1, 0],
+        duration: 220,
+        easing: 'easeOutQuad',
+      });
+    }
+
+    if (mobileDrawerRef.current) {
+      remove(mobileDrawerRef.current);
+      animate(mobileDrawerRef.current, {
+        translateX: ['0%', '-100%'],
+        duration: 280,
+        easing: 'easeInCubic',
+        complete: () => setShowMobileDrawer(false),
+      });
+    } else {
+      setShowMobileDrawer(false);
+    }
+  }, [isMobileMenuOpen, isMobile, showMobileDrawer]);
+
+  useEffect(() => {
+    if (!showMobileDrawer || !isMobileMenuOpen) return;
+
+    if (mobileBackdropRef.current) {
+      mobileBackdropRef.current.style.opacity = '0';
+      remove(mobileBackdropRef.current);
+      animate(mobileBackdropRef.current, {
+        opacity: [0, 1],
+        duration: 220,
+        easing: 'easeOutQuad',
+      });
+    }
+
+    if (mobileDrawerRef.current) {
+      mobileDrawerRef.current.style.transform = 'translateX(-100%)';
+      remove(mobileDrawerRef.current);
+      animate(mobileDrawerRef.current, {
+        translateX: ['-100%', '0%'],
+        duration: 340,
+        easing: 'easeOutCubic',
+      });
+    }
+  }, [showMobileDrawer, isMobileMenuOpen]);
 
   const categoryColors: Record<string, string> = {
     Personal: 'bg-violet-500',
@@ -169,19 +250,12 @@ export default function Sidebar({ onSettingsClick, isMobileMenuOpen, onMobileMen
             <Sparkles className="w-5 h-5 text-white" />
           </div>
 
-          <AnimatePresence mode="wait">
-            {isOpen && (
-              <motion.div
-                initial={{ opacity: 0, x: -6 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -6 }}
-                className="min-w-0 flex-1"
-              >
-                <p className="text-white text-lg font-bold leading-tight">NoteFlow</p>
-                <p className="text-xs text-white/45 mt-0.5">Capture. Organize. Focus.</p>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {isOpen && (
+            <div className="min-w-0 flex-1">
+              <p className="text-white text-lg font-bold leading-tight">NoteFlow</p>
+              <p className="text-xs text-white/45 mt-0.5">Capture. Organize. Focus.</p>
+            </div>
+          )}
 
           {!isMobile && (
             <button
@@ -251,18 +325,11 @@ export default function Sidebar({ onSettingsClick, isMobileMenuOpen, onMobileMen
                 )
               )
             ) : (
-              <AnimatePresence mode="wait">
-                {isOpen && (
-                  <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="text-xs text-white/35 px-3 py-2"
-                  >
-                    Categories will appear as you create notes.
-                  </motion.p>
-                )}
-              </AnimatePresence>
+              isOpen && (
+                <p className="text-xs text-white/35 px-3 py-2">
+                  Categories will appear as you create notes.
+                </p>
+              )
             )}
           </div>
         </div>
@@ -292,46 +359,38 @@ export default function Sidebar({ onSettingsClick, isMobileMenuOpen, onMobileMen
   return (
     <>
       {!isMobile && (
-        <motion.aside
-          initial={false}
-          animate={{ width: isOpen ? 292 : 92 }}
-          transition={{ type: 'spring', stiffness: 220, damping: 28, mass: 0.9 }}
+        <aside
+          ref={desktopSidebarRef}
+          style={{ width: '292px' }}
           className="h-screen sticky top-0 hidden lg:flex flex-col z-20 overflow-hidden bg-[#0a0a0f]/85 backdrop-blur-xl border-r border-white/[0.08]"
         >
           {sidebarContent}
-        </motion.aside>
+        </aside>
       )}
 
-      <AnimatePresence>
-        {isMobile && isMobileMenuOpen && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={onMobileMenuClose}
-              className="fixed inset-0 bg-black/65 backdrop-blur-sm z-40 lg:hidden"
-            />
+      {isMobile && showMobileDrawer && (
+        <>
+          <div
+            ref={mobileBackdropRef}
+            onClick={onMobileMenuClose}
+            className="fixed inset-0 bg-black/65 backdrop-blur-sm z-40 lg:hidden"
+          />
 
-            <motion.aside
-              initial={{ x: '-100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '-100%' }}
-              transition={{ type: 'spring', stiffness: 320, damping: 30 }}
-              className="fixed inset-y-0 left-0 w-[300px] max-w-[88vw] z-50 flex flex-col bg-[#0a0a0f]/95 backdrop-blur-xl border-r border-white/[0.08] lg:hidden"
+          <aside
+            ref={mobileDrawerRef}
+            className="fixed inset-y-0 left-0 w-[300px] max-w-[88vw] z-50 flex flex-col bg-[#0a0a0f]/95 backdrop-blur-xl border-r border-white/[0.08] lg:hidden"
+          >
+            <button
+              onClick={onMobileMenuClose}
+              className="absolute top-4 right-4 w-9 h-9 rounded-xl bg-white/[0.05] border border-white/[0.1] flex items-center justify-center text-white/60 hover:text-white transition-all z-10"
+              title="Close menu"
             >
-              <button
-                onClick={onMobileMenuClose}
-                className="absolute top-4 right-4 w-9 h-9 rounded-xl bg-white/[0.05] border border-white/[0.1] flex items-center justify-center text-white/60 hover:text-white transition-all z-10"
-                title="Close menu"
-              >
-                <X className="w-5 h-5" />
-              </button>
-              {sidebarContent}
-            </motion.aside>
-          </>
-        )}
-      </AnimatePresence>
+              <X className="w-5 h-5" />
+            </button>
+            {sidebarContent}
+          </aside>
+        </>
+      )}
     </>
   );
 }
