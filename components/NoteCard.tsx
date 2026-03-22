@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { Note, NOTE_COLORS } from '@/types/note';
 import { useNotes } from '@/context/NotesContext';
+import { htmlToPreviewText } from '@/lib/richText';
 
 interface NoteCardProps {
   note: Note;
@@ -32,11 +33,6 @@ export default function NoteCard({ note, onEdit, onView }: NoteCardProps) {
     if (days === 1) return 'Yesterday';
     if (days < 7) return `${days}d ago`;
     return new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-  };
-
-  const truncateContent = (content: string, maxLength: number = 100) => {
-    if (content.length <= maxLength) return content;
-    return content.substring(0, maxLength) + '...';
   };
 
   const handleCardClick = (e: React.MouseEvent) => {
@@ -79,7 +75,7 @@ export default function NoteCard({ note, onEdit, onView }: NoteCardProps) {
         
         {/* Content Preview */}
         <p className="text-white/60 text-sm leading-relaxed mb-auto whitespace-pre-wrap line-clamp-3">
-          {truncateContent(note.content)}
+          {htmlToPreviewText(note.content)}
         </p>
 
         {/* Bottom Section */}

@@ -224,6 +224,51 @@
     min-height: 48px;
     min-width: 48px;
   }
+
+  .note-editor {
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  .note-editor b,
+  .note-editor strong {
+    font-weight: 700;
+  }
+
+  .note-editor i,
+  .note-editor em {
+    font-style: italic;
+  }
+
+  .note-editor u {
+    text-decoration: underline;
+  }
+
+  .note-rich-content {
+    line-height: 1.75;
+  }
+
+  .note-rich-content p {
+    margin: 0 0 0.65rem 0;
+  }
+
+  .note-rich-content p:last-child {
+    margin-bottom: 0;
+  }
+
+  .note-rich-content b,
+  .note-rich-content strong {
+    font-weight: 700;
+  }
+
+  .note-rich-content i,
+  .note-rich-content em {
+    font-style: italic;
+  }
+
+  .note-rich-content u {
+    text-decoration: underline;
+  }
 }
 
 @layer utilities {

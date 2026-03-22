@@ -3,6 +3,7 @@
 import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
 import { Note, FilterState, CATEGORIES, NOTE_COLORS } from '@/types/note';
 import { getNotes, saveNotes } from '@/lib/indexedDB';
+import { stripHtml } from '@/lib/richText';
 
 interface NotesContextType {
   notes: Note[];
@@ -164,7 +165,7 @@ export function NotesProvider({ children }: { children: ReactNode }) {
     if (filters.searchQuery) {
       const query = filters.searchQuery.toLowerCase();
       const matchesTitle = note.title.toLowerCase().includes(query);
-      const matchesContent = note.content.toLowerCase().includes(query);
+      const matchesContent = stripHtml(note.content).toLowerCase().includes(query);
       if (!matchesTitle && !matchesContent) return false;
     }
     if (filters.showArchived && !note.isArchived) return false;

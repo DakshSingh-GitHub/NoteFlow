@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { Note, NoteEvent } from '@/types/note';
+import { stripHtml } from '@/lib/richText';
 
 interface NotificationContextType {
   notifications: NoteEvent[];
@@ -233,14 +234,15 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   };
 
   const extractEventDescription = (note: Note, text: string): string => {
+    const plainContent = stripHtml(note.content);
     // Get the sentence containing the date/time reference
-    const sentences = note.content.split(/[.!?]+/);
+    const sentences = plainContent.split(/[.!?]+/);
     for (const sentence of sentences) {
       if (sentence.toLowerCase().includes(text.toLowerCase())) {
         return sentence.trim();
       }
     }
-    return note.content.substring(0, 100) + (note.content.length > 100 ? '...' : '');
+    return plainContent.substring(0, 100) + (plainContent.length > 100 ? '...' : '');
   };
 
   const scanNotesForEvents = useCallback((notes: Note[]) => {
@@ -250,7 +252,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     notes.forEach(note => {
       if (note.isArchived) return;
       
-      const textToScan = `${note.title} ${note.content}`;
+      const textToScan = `${note.title} ${stripHtml(note.content)}`;
       const lines = textToScan.split(/\n/);
       
       lines.forEach(line => {

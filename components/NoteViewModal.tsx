@@ -14,6 +14,7 @@ import {
 import { Note, NOTE_COLORS } from '@/types/note';
 import { useNotes } from '@/context/NotesContext';
 import { useEffect, useState } from 'react';
+import { sanitizeRichHtml } from '@/lib/richText';
 
 interface NoteViewModalProps {
   note: Note | null;
@@ -149,9 +150,10 @@ export default function NoteViewModal({ note, isOpen, onClose, onEdit }: NoteVie
 
               {/* Content */}
               <div className="bg-white/[0.02] rounded-xl p-5 mb-6 border border-white/[0.06]">
-                <p className="text-white/80 text-base leading-relaxed whitespace-pre-wrap">
-                  {note.content}
-                </p>
+                <div
+                  className="note-rich-content text-white/80 text-base leading-relaxed whitespace-pre-wrap"
+                  dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(note.content) }}
+                />
               </div>
 
               {/* Actions */}
