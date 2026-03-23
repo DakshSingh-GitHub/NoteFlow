@@ -169,14 +169,14 @@ export default function NoteModal({ isOpen, onClose, editingNoteId }: NoteModalP
             onClose();
             setIsCategoryOpen(false);
           }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/70 backdrop-blur-md"
+          className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-3 sm:p-5 bg-black/70 backdrop-blur-md overflow-y-auto"
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 16 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 16 }}
             onClick={(e) => e.stopPropagation()}
-            className="w-[92vw] md:w-[70vw] max-w-6xl h-[88vh] max-h-[880px] bg-[#0f0f14] rounded-2xl overflow-hidden border border-white/[0.08] shadow-2xl flex flex-col"
+            className="my-3 sm:my-0 w-[92vw] md:w-[70vw] max-w-6xl h-[92dvh] sm:h-[88vh] max-h-[92dvh] sm:max-h-[880px] bg-[#0f0f14] rounded-2xl overflow-hidden border border-white/[0.08] shadow-2xl flex flex-col"
           >
             <div className="h-2.5" style={getGradientStyle(color)} />
 
@@ -200,9 +200,9 @@ export default function NoteModal({ isOpen, onClose, editingNoteId }: NoteModalP
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-6 flex-1 min-h-0 flex flex-col">
-              <div className="grid grid-cols-1 lg:grid-cols-[1.9fr_1fr] gap-6 flex-1 min-h-0 ">
-                <div className="space-y-4 min-h-0 flex flex-col pb-3">
+            <form onSubmit={handleSubmit} className="p-4 sm:p-6 flex-1 flex flex-col overflow-y-auto lg:overflow-hidden">
+              <div className="grid grid-cols-1 lg:grid-cols-[1.9fr_1fr] gap-4 lg:gap-6 lg:flex-1 lg:min-h-0">
+                <div className="space-y-4 lg:min-h-0 lg:flex lg:flex-col lg:pb-3">
                   <div>
                     <label className="block text-xs font-medium text-white/40 mb-2 uppercase tracking-wider">
                       Title
@@ -217,7 +217,7 @@ export default function NoteModal({ isOpen, onClose, editingNoteId }: NoteModalP
                     />
                   </div>
 
-                  <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] overflow-hidden flex flex-col flex-1 min-h-0 ">
+                  <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] overflow-hidden flex flex-col min-h-[260px] lg:flex-1 lg:min-h-0">
                     <div className="flex flex-wrap items-center gap-2 p-3 border-b border-white/[0.08] bg-white/[0.02]">
                       <button
                         type="button"
@@ -282,7 +282,7 @@ export default function NoteModal({ isOpen, onClose, editingNoteId }: NoteModalP
                       </button>
                     </div>
 
-                    <div className="relative flex-1 min-h-0">
+                    <div className="relative min-h-[180px] max-h-[40dvh] overflow-y-auto lg:flex-1 lg:min-h-0 lg:max-h-none">
                       {isEditorEmpty && (
                         <div className="pointer-events-none absolute top-0 left-0 p-4 text-white/25 text-sm">
                           Write your note... select text to apply size, color, bold, italic, underline.
@@ -299,7 +299,7 @@ export default function NoteModal({ isOpen, onClose, editingNoteId }: NoteModalP
                           document.execCommand('insertText', false, text);
                           syncEditorContent();
                         }}
-                        className="note-editor h-full overflow-y-auto p-4 text-white/90 focus:outline-none"
+                        className="note-editor h-full min-h-[180px] lg:min-h-0 overflow-y-auto p-4 text-white/90 focus:outline-none"
                       />
                     </div>
                   </div>
@@ -401,7 +401,7 @@ export default function NoteModal({ isOpen, onClose, editingNoteId }: NoteModalP
                 </div>
               </div>
 
-              <div className="flex gap-3 pt-6 mt-8 border-t border-white/[0.06]">
+              <div className="flex gap-3 pt-4 lg:pt-6 mt-5 lg:mt-8 border-t border-white/[0.06]">
                 <button
                   type="button"
                   onClick={() => {

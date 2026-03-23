@@ -344,3 +344,14 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+@media (max-width: 639px) {
+  html {
+    font-size: 15px;
+  }
+
+  body {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+}
