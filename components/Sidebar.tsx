@@ -172,9 +172,10 @@ export default function Sidebar({ onSettingsClick, isMobileMenuOpen, onMobileMen
     onSettingsClick();
     if (isMobile) onMobileMenuClose();
   };
+  const isExpanded = isMobile || isOpen;
 
   const sectionLabel = (label: string, Icon?: LucideIcon) =>
-    isOpen ? (
+    isExpanded ? (
       <div className="px-3 mb-2 flex items-center gap-2 text-[11px] font-semibold tracking-[0.12em] uppercase text-white/35">
         {Icon && <Icon className="w-3.5 h-3.5 text-white/35" />}
         <span>{label}</span>
@@ -197,9 +198,9 @@ export default function Sidebar({ onSettingsClick, isMobileMenuOpen, onMobileMen
     <button
       key={key}
       onClick={onClick}
-      title={!isOpen ? label : undefined}
+      title={!isExpanded ? label : undefined}
       className={`w-full group relative transition-all duration-200 border ${
-        isOpen ? 'rounded-xl px-3.5 py-2.5' : 'rounded-2xl px-2 py-1.5'
+        isExpanded ? 'rounded-xl px-3.5 py-2.5' : 'rounded-2xl px-2 py-1.5'
       } ${
         isActive
           ? 'bg-purple-500/14 border-purple-500/25 text-purple-200'
@@ -208,7 +209,7 @@ export default function Sidebar({ onSettingsClick, isMobileMenuOpen, onMobileMen
     >
       <div
         className={`flex items-center ${
-          isOpen ? 'gap-3.5' : 'justify-center mx-auto w-11 h-11 rounded-xl border border-white/[0.08] bg-white/[0.02]'
+          isExpanded ? 'gap-3.5' : 'justify-center mx-auto w-11 h-11 rounded-xl border border-white/[0.08] bg-white/[0.02]'
         }`}
       >
         {leftDot ? (
@@ -221,9 +222,9 @@ export default function Sidebar({ onSettingsClick, isMobileMenuOpen, onMobileMen
           />
         )}
 
-        {isOpen && <span className="flex-1 text-left text-sm font-medium truncate">{label}</span>}
+        {isExpanded && <span className="flex-1 text-left text-sm font-medium truncate">{label}</span>}
 
-        {isOpen && count > 0 && (
+        {isExpanded && count > 0 && (
           <span
             className={`min-w-6 h-5 px-1.5 rounded-full text-[11px] font-semibold inline-flex items-center justify-center ${
               isActive ? 'bg-purple-500/28 text-purple-100' : 'bg-white/[0.08] text-white/55'
@@ -233,7 +234,7 @@ export default function Sidebar({ onSettingsClick, isMobileMenuOpen, onMobileMen
           </span>
         )}
 
-        {!isOpen && count > 0 && (
+        {!isExpanded && count > 0 && (
           <span className="absolute top-0.5 right-0.5 z-20 min-w-[20px] h-5 px-1 rounded-full bg-fuchsia-500 text-[10px] font-extrabold text-white border-2 border-[#0b0b11] inline-flex items-center justify-center shadow-lg shadow-fuchsia-500/60">
             {count > 9 ? '9+' : count}
           </span>
@@ -244,13 +245,13 @@ export default function Sidebar({ onSettingsClick, isMobileMenuOpen, onMobileMen
 
   const sidebarContent = (
     <>
-      <div className={`px-4 border-b border-white/[0.08] ${isOpen ? 'py-4' : 'py-5'}`}>
-        <div className={`flex items-center ${isOpen ? 'gap-3' : 'flex-col justify-center gap-2.5'}`}>
+      <div className={`px-4 border-b border-white/[0.08] ${isExpanded ? 'py-4' : 'py-5'}`}>
+        <div className={`flex items-center ${isExpanded ? 'gap-3' : 'flex-col justify-center gap-2.5'}`}>
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 via-violet-600 to-fuchsia-600 flex items-center justify-center shadow-lg shadow-purple-500/20 flex-shrink-0">
             <Sparkles className="w-5 h-5 text-white" />
           </div>
 
-          {isOpen && (
+          {isExpanded && (
             <div className="min-w-0 flex-1">
               <p className="text-white text-lg font-bold leading-tight">NoteFlow</p>
               <p className="text-xs text-white/45 mt-0.5">Capture. Organize. Focus.</p>
@@ -273,8 +274,8 @@ export default function Sidebar({ onSettingsClick, isMobileMenuOpen, onMobileMen
         </div>
       </div>
 
-      <div className={`flex-1 min-h-0 px-3 py-4 overflow-y-auto overflow-x-hidden ${isOpen ? 'space-y-5' : 'space-y-6'}`}>
-        {isOpen && (
+      <div className={`flex-1 min-h-0 px-3 py-4 overflow-y-auto overflow-x-hidden ${isExpanded ? 'space-y-5' : 'space-y-6'}`}>
+        {isExpanded && (
           <div className="rounded-xl border border-white/[0.08] bg-gradient-to-br from-white/[0.05] to-white/[0.02] px-3.5 py-3">
             <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.1em] text-white/35 mb-2">
               <Layers3 className="w-3.5 h-3.5" />
@@ -325,7 +326,7 @@ export default function Sidebar({ onSettingsClick, isMobileMenuOpen, onMobileMen
                 )
               )
             ) : (
-              isOpen && (
+              isExpanded && (
                 <p className="text-xs text-white/35 px-3 py-2">
                   Categories will appear as you create notes.
                 </p>
@@ -335,21 +336,21 @@ export default function Sidebar({ onSettingsClick, isMobileMenuOpen, onMobileMen
         </div>
       </div>
 
-      <div className={`p-3 border-t border-white/[0.08] bg-[#0a0a0f]/60 ${isOpen ? '' : 'pb-4'}`}>
+      <div className={`p-3 border-t border-white/[0.08] bg-[#0a0a0f]/60 ${isExpanded ? '' : 'pb-4'} ${isMobile ? 'safe-area-inset-bottom' : ''}`}>
         <button
           onClick={handleSettingsClick}
-          title={!isOpen ? 'Settings' : undefined}
+          title={!isExpanded ? 'Settings' : undefined}
           className={`w-full rounded-xl transition-all duration-200 border ${
-            isOpen ? 'px-3.5 py-2.5' : 'px-2 py-1.5'
+            isExpanded ? 'px-3.5 py-2.5' : 'px-2 py-1.5'
           } border-transparent text-white/65 hover:text-white hover:bg-white/[0.05]`}
         >
           <div
             className={`flex items-center ${
-              isOpen ? 'gap-3.5' : 'justify-center mx-auto w-11 h-11 rounded-xl border border-white/[0.08] bg-white/[0.02]'
+              isExpanded ? 'gap-3.5' : 'justify-center mx-auto w-11 h-11 rounded-xl border border-white/[0.08] bg-white/[0.02]'
             }`}
           >
             <Settings className="w-[18px] h-[18px] text-white/50" />
-            {isOpen && <span className="text-sm font-medium">Settings</span>}
+            {isExpanded && <span className="text-sm font-medium">Settings</span>}
           </div>
         </button>
       </div>
@@ -378,7 +379,7 @@ export default function Sidebar({ onSettingsClick, isMobileMenuOpen, onMobileMen
 
           <aside
             ref={mobileDrawerRef}
-            className="fixed inset-y-0 left-0 w-[300px] max-w-[88vw] z-50 flex flex-col bg-[#0a0a0f]/95 backdrop-blur-xl border-r border-white/[0.08] lg:hidden"
+            className="fixed inset-y-0 left-0 w-[92vw] max-w-[360px] z-50 flex flex-col bg-[#0a0a0f]/95 backdrop-blur-xl border-r border-white/[0.08] lg:hidden safe-area-inset-top"
           >
             <button
               onClick={onMobileMenuClose}
