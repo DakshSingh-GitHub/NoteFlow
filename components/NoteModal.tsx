@@ -59,6 +59,8 @@ export default function NoteModal({ isOpen, onClose, editingNoteId }: NoteModalP
     }
     if (isOpen && editorRef.current) {
       editorRef.current.innerHTML = nextContent;
+      normalizeEditorFormatting(editorRef.current);
+      syncEditorContent();
     }
   }, [editingNote, isOpen]);
 
@@ -96,8 +98,9 @@ export default function NoteModal({ isOpen, onClose, editingNoteId }: NoteModalP
     editorRef.current.focus();
     document.execCommand('styleWithCSS', false, 'true');
     document.execCommand(command, false, value);
-    normalizeLegacyFontTags(editorRef.current);
+    normalizeEditorFormatting(editorRef.current);
     syncEditorContent();
+    syncToolbarStateFromSelection();
   };
 
   const handleTextColorChange = (newColor: string) => {
@@ -112,6 +115,32 @@ export default function NoteModal({ isOpen, onClose, editingNoteId }: NoteModalP
 
   const clearFormatting = () => {
     applyCommand('removeFormat');
+  };
+
+  const syncToolbarStateFromSelection = () => {
+    if (!editorRef.current) return;
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) return;
+
+    const range = selection.getRangeAt(0);
+    let node = range.startContainer as Node | null;
+    if (node && node.nodeType === Node.TEXT_NODE) {
+      node = node.parentElement;
+    }
+
+    const element = node instanceof Element ? node : null;
+    if (!element || !editorRef.current.contains(element)) return;
+
+    const computed = window.getComputedStyle(element);
+    const fontSizePx = parseFloat(computed.fontSize || '16');
+    if (!Number.isNaN(fontSizePx)) {
+      setSelectedFontLegacy(getClosestLegacySize(fontSizePx));
+    }
+
+    const color = normalizeComputedColorToHex(computed.color);
+    if (color) {
+      setSelectedTextColor(color);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -293,11 +322,17 @@ export default function NoteModal({ isOpen, onClose, editingNoteId }: NoteModalP
                         contentEditable
                         suppressContentEditableWarning
                         onInput={syncEditorContent}
+                        onKeyUp={syncToolbarStateFromSelection}
+                        onMouseUp={syncToolbarStateFromSelection}
                         onPaste={(e) => {
                           e.preventDefault();
                           const text = e.clipboardData.getData('text/plain');
                           document.execCommand('insertText', false, text);
+                          if (editorRef.current) {
+                            normalizeEditorFormatting(editorRef.current);
+                          }
                           syncEditorContent();
+                          syncToolbarStateFromSelection();
                         }}
                         className="note-editor h-full min-h-[180px] lg:min-h-0 overflow-y-auto p-4 text-white/90 focus:outline-none"
                       />
@@ -436,7 +471,7 @@ export default function NoteModal({ isOpen, onClose, editingNoteId }: NoteModalP
   );
 }
 
-function normalizeLegacyFontTags(editor: HTMLDivElement) {
+function normalizeEditorFormatting(editor: HTMLDivElement) {
   const legacyNodes = editor.querySelectorAll('font[size]');
   legacyNodes.forEach((node) => {
     const size = node.getAttribute('size');
@@ -446,6 +481,65 @@ function normalizeLegacyFontTags(editor: HTMLDivElement) {
     span.innerHTML = node.innerHTML;
     node.replaceWith(span);
   });
+
+  const styledNodes = editor.querySelectorAll<HTMLElement>('[style*="font-size"]');
+  styledNodes.forEach((node) => {
+    const raw = node.style.fontSize;
+    const parsed = parseCssFontSizePx(raw);
+    if (!parsed) return;
+    const closest = FONT_SIZE_OPTIONS.find((opt) => opt.legacy === getClosestLegacySize(parsed));
+    const normalizedPx = closest?.px ?? 16;
+    node.style.fontSize = `${normalizedPx}px`;
+  });
+}
+
+function getClosestLegacySize(px: number): string {
+  return FONT_SIZE_OPTIONS.reduce((closest, option) => {
+    const currentDelta = Math.abs(option.px - px);
+    const bestOption = FONT_SIZE_OPTIONS.find((opt) => opt.legacy === closest) || FONT_SIZE_OPTIONS[1];
+    const bestDelta = Math.abs(bestOption.px - px);
+    return currentDelta < bestDelta ? option.legacy : closest;
+  }, '4');
+}
+
+function parseCssFontSizePx(value: string): number | null {
+  if (!value) return null;
+  const v = value.trim().toLowerCase();
+
+  if (v.endsWith('px')) {
+    const parsed = parseFloat(v);
+    return Number.isNaN(parsed) ? null : parsed;
+  }
+  if (v.endsWith('rem') || v.endsWith('em')) {
+    const parsed = parseFloat(v);
+    return Number.isNaN(parsed) ? null : parsed * 16;
+  }
+  if (v.endsWith('%')) {
+    const parsed = parseFloat(v);
+    return Number.isNaN(parsed) ? null : (parsed / 100) * 16;
+  }
+
+  const keywordMap: Record<string, number> = {
+    'xx-small': 9,
+    'x-small': 10,
+    small: 13,
+    medium: 16,
+    large: 18,
+    'x-large': 24,
+    'xx-large': 32,
+    smaller: 13,
+    larger: 19,
+  };
+
+  return keywordMap[v] || null;
+}
+
+function normalizeComputedColorToHex(color: string): string | null {
+  if (!color) return null;
+  const rgb = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
+  if (!rgb) return null;
+  const toHex = (value: string) => Number(value).toString(16).padStart(2, '0');
+  return `#${toHex(rgb[1])}${toHex(rgb[2])}${toHex(rgb[3])}`;
 }
 
 function getColorHex(colorClass: string): string {

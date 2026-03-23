@@ -46,7 +46,7 @@ export function sanitizeRichHtml(html: string): string {
   sanitized = sanitized.replace(/\s(href|src)\s*=\s*(['"])\s*javascript:[\s\S]*?\2/gi, '');
 
   sanitized = sanitized.replace(/\sstyle=(['"])(.*?)\1/gi, (_, quote: string, styleValue: string) => {
-    const allowedProps = ['color', 'font-size', 'font-weight', 'font-style', 'text-decoration'];
+    const allowedProps = ['color', 'font-size', 'font-weight', 'font-style', 'text-decoration', 'text-align'];
     const kept = styleValue
       .split(';')
       .map((rule) => rule.trim())
@@ -60,12 +60,6 @@ export function sanitizeRichHtml(html: string): string {
     return ` style=${quote}${kept.join('; ')}${quote}`;
   });
 
-  sanitized = sanitized
-    .replace(/<div><br><\/div>/gi, '<br>')
-    .replace(/<\/div><div>/gi, '<br>')
-    .replace(/<div>/gi, '')
-    .replace(/<\/div>/gi, '');
-
   return sanitized.trim();
 }
 
@@ -74,4 +68,3 @@ export function htmlToPreviewText(html: string, maxLength = 100): string {
   if (plain.length <= maxLength) return plain;
   return `${plain.substring(0, maxLength)}...`;
 }
-
