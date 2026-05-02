@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { FileX, Sparkles, Search, Quote } from 'lucide-react';
+import { Sparkles, Search, Quote } from 'lucide-react';
 import { useNotes } from '@/context/NotesContext';
 import { useInsights } from '@/context/InsightsContext';
 import { Note } from '@/types/note';

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, createContext, useContext, ReactNode, useCallback } from 'react';
+import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
 import { useNotes } from './NotesContext';
 import { generateInsight, NoteInsight, getQuickStats } from '@/lib/insights';
 

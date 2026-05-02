@@ -11,12 +11,13 @@ import {
   ChevronRight,
   X,
   Layers3,
-  type LucideIcon,
 } from 'lucide-react';
 import { useNotes } from '@/context/NotesContext';
 import { CATEGORIES } from '@/types/note';
 import { useState, useEffect, useRef } from 'react';
 import { animate, remove } from 'animejs';
+
+type LucideIcon = any;
 
 interface SidebarProps {
   onSettingsClick: () => void;
