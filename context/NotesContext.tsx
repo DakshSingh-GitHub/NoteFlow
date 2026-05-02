@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
+import { useState, useEffect, createContext, useContext, ReactNode, useMemo } from 'react';
 import { Note, FilterState, CATEGORIES, NOTE_COLORS } from '@/types/note';
 import { getNotes, saveNotes } from '@/lib/indexedDB';
 import { stripHtml } from '@/lib/richText';
@@ -160,43 +160,69 @@ export function NotesProvider({ children }: { children: ReactNode }) {
     setFiltersState(prev => ({ ...prev, ...newFilters }));
   };
 
-  const filteredNotes = notes.filter(note => {
-    if (filters.category && note.category !== filters.category) return false;
-    if (filters.searchQuery) {
-      const query = filters.searchQuery.toLowerCase();
-      const matchesTitle = note.title.toLowerCase().includes(query);
-      const matchesContent = stripHtml(note.content).toLowerCase().includes(query);
-      if (!matchesTitle && !matchesContent) return false;
-    }
-    if (filters.showArchived && !note.isArchived) return false;
-    if (!filters.showArchived && note.isArchived) return false;
-    if (filters.showPinned && !note.isPinned) return false;
-    return true;
-  });
+  const { filteredNotes, stats, categories } = useMemo(() => {
+    const filtered: Note[] = [];
+    const statsResult = {
+      total: notes.length,
+      pinned: 0,
+      archived: 0,
+      byCategory: CATEGORIES.reduce((acc, cat) => {
+        acc[cat] = 0;
+        return acc;
+      }, {} as Record<string, number>),
+    };
+    const categoriesSet = new Set<string>();
 
-  const sortedNotes = filteredNotes.sort((a, b) => {
-    if (a.isPinned && !b.isPinned) return -1;
-    if (!a.isPinned && b.isPinned) return 1;
-    return b.updatedAt.getTime() - a.updatedAt.getTime();
-  });
+    notes.forEach(note => {
+      // Stats calculation
+      if (note.isPinned) statsResult.pinned++;
+      if (note.isArchived) {
+        statsResult.archived++;
+      } else {
+        if (note.category in statsResult.byCategory) {
+          statsResult.byCategory[note.category]++;
+        }
+      }
+      categoriesSet.add(note.category);
 
-  const stats = {
-    total: notes.length,
-    pinned: notes.filter(n => n.isPinned).length,
-    archived: notes.filter(n => n.isArchived).length,
-    byCategory: CATEGORIES.reduce((acc, cat) => {
-      acc[cat] = notes.filter(n => n.category === cat && !n.isArchived).length;
-      return acc;
-    }, {} as Record<string, number>),
-  };
+      // Filtering logic
+      let matches = true;
+      if (filters.category && note.category !== filters.category) matches = false;
+      if (matches && filters.searchQuery) {
+        const query = filters.searchQuery.toLowerCase();
+        const matchesTitle = note.title.toLowerCase().includes(query);
+        const matchesContent = stripHtml(note.content).toLowerCase().includes(query);
+        if (!matchesTitle && !matchesContent) matches = false;
+      }
+      if (matches) {
+        if (filters.showArchived && !note.isArchived) matches = false;
+        if (!filters.showArchived && note.isArchived) matches = false;
+      }
+      if (matches && filters.showPinned && !note.isPinned) matches = false;
 
-  const categories = Array.from(new Set(notes.map(n => n.category)));
+      if (matches) {
+        filtered.push(note);
+      }
+    });
+
+    const sorted = filtered.sort((a, b) => {
+      if (a.isPinned && !b.isPinned) return -1;
+      if (!a.isPinned && b.isPinned) return 1;
+      return b.updatedAt.getTime() - a.updatedAt.getTime();
+    });
+
+    return {
+      filteredNotes: sorted,
+      stats: statsResult,
+      categories: Array.from(categoriesSet),
+    };
+  }, [notes, filters]);
 
   return (
     <NotesContext.Provider
       value={{
-        notes: sortedNotes,
-        filteredNotes: sortedNotes,
+        notes: filteredNotes,
+        filteredNotes: filteredNotes,
         filters,
         addNote,
         updateNote,
