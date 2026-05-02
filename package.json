@@ -7,7 +7,8 @@
     "build": "next build --webpack",
     "start": "next start",
     "lint": "next lint",
-    "generate:icons": "node public/icons/generate.js"
+    "generate:icons": "node public/icons/generate.js",
+    "test": "node --test --experimental-strip-types"
   },
   "dependencies": {
     "animejs": "^4.3.6",
