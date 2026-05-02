@@ -174,14 +174,11 @@ export default function NoteModal({ isOpen, onClose, editingNoteId }: NoteModalP
     }
   };
 
-  const selectedColorName = NOTE_COLORS.find((c) => c.value === color)?.name || 'Purple';
+  const selectedColor = NOTE_COLORS.find((c) => c.value === color) || NOTE_COLORS[0];
 
-  const getGradientStyle = (colorValue: string) => {
-    const gradientColors = colorValue.replace('from-', '').replace('to-', '').split(' ');
-    const fromColor = gradientColors[0];
-    const toColor = gradientColors[1] || gradientColors[0];
+  const getGradientStyle = (colorData: typeof NOTE_COLORS[0]) => {
     return {
-      background: `linear-gradient(90deg, ${getColorHex(fromColor)}, ${getColorHex(toColor)})`,
+      background: `linear-gradient(90deg, ${colorData.hex}, ${colorData.hexSecondary})`,
     };
   };
 
@@ -207,9 +204,9 @@ export default function NoteModal({ isOpen, onClose, editingNoteId }: NoteModalP
             onClick={(e) => e.stopPropagation()}
             className="my-3 sm:my-0 w-[92vw] md:w-[70vw] max-w-6xl h-[92dvh] sm:h-[88vh] max-h-[92dvh] sm:max-h-[880px] bg-[#0f0f14] rounded-2xl overflow-hidden border border-white/[0.08] shadow-2xl flex flex-col"
           >
-            <div className="h-2.5" style={getGradientStyle(color)} />
+            <div className="h-1.5" style={getGradientStyle(selectedColor)} />
 
-            <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
+            <div className="flex items-center justify-between px-6 py-5 border-b border-white/[0.06]">
               <div>
                 <h2 className="text-xl font-semibold text-white">
                   {editingNoteId ? 'Edit Note' : 'Create Note'}
@@ -223,7 +220,7 @@ export default function NoteModal({ isOpen, onClose, editingNoteId }: NoteModalP
                   onClose();
                   setIsCategoryOpen(false);
                 }}
-                className="w-9 h-9 rounded-lg bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.08] transition-all"
+                className="w-9 h-9 rounded-xl glass flex items-center justify-center text-white/50 hover:text-white transition-all"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -394,10 +391,6 @@ export default function NoteModal({ isOpen, onClose, editingNoteId }: NoteModalP
                     </label>
                     <div className="grid grid-cols-5 gap-2">
                       {NOTE_COLORS.slice(0, 10).map((c) => {
-                        const gradientColors = c.value.replace('from-', '').replace('to-', '').split(' ');
-                        const fromColor = gradientColors[0];
-                        const toColor = gradientColors[1] || gradientColors[0];
-
                         return (
                           <button
                             key={c.name}
@@ -413,7 +406,7 @@ export default function NoteModal({ isOpen, onClose, editingNoteId }: NoteModalP
                             <div
                               className="absolute inset-0"
                               style={{
-                                background: `linear-gradient(135deg, ${getColorHex(fromColor)}, ${getColorHex(toColor)})`,
+                                background: `linear-gradient(135deg, ${c.hex}, ${c.hexSecondary})`,
                               }}
                             />
                           </button>
@@ -421,7 +414,7 @@ export default function NoteModal({ isOpen, onClose, editingNoteId }: NoteModalP
                       })}
                     </div>
                     <p className="text-xs text-white/45 mt-3">
-                      Active palette: <span className="text-white/75">{selectedColorName}</span>
+                      Active palette: <span className="text-white/75">{selectedColor.name}</span>
                     </p>
                   </div>
 
@@ -443,7 +436,7 @@ export default function NoteModal({ isOpen, onClose, editingNoteId }: NoteModalP
                     onClose();
                     setIsCategoryOpen(false);
                   }}
-                  className="flex-1 px-4 py-3 rounded-xl bg-white/[0.04] border border-white/[0.08] text-white/70 font-medium hover:bg-white/[0.08] hover:text-white transition-all"
+                  className="flex-1 btn-secondary"
                 >
                   Cancel
                 </button>
@@ -451,7 +444,7 @@ export default function NoteModal({ isOpen, onClose, editingNoteId }: NoteModalP
                 <button
                   type="submit"
                   disabled={!title.trim() || isSubmitting}
-                  className="flex-1 px-4 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-violet-600 text-white font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg hover:shadow-purple-500/20 transition-all"
+                  className="flex-1 btn-primary flex items-center justify-center gap-2"
                 >
                   {isSubmitting ? (
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -542,33 +535,3 @@ function normalizeComputedColorToHex(color: string): string | null {
   return `#${toHex(rgb[1])}${toHex(rgb[2])}${toHex(rgb[3])}`;
 }
 
-function getColorHex(colorClass: string): string {
-  const colorMap: Record<string, string> = {
-    'purple-600': '#9333ea',
-    'fuchsia-600': '#c026d3',
-    'blue-600': '#2563eb',
-    'cyan-500': '#06b6d4',
-    'emerald-600': '#059669',
-    'teal-500': '#14b8a6',
-    'orange-600': '#ea580c',
-    'amber-500': '#f59e0b',
-    'rose-600': '#e11d48',
-    'red-600': '#dc2626',
-    'pink-600': '#db2777',
-    'yellow-500': '#eab308',
-    'indigo-600': '#4f46e5',
-    'purple-700': '#7e22ce',
-    'sky-500': '#0ea5e9',
-    'lime-500': '#84cc16',
-    'green-600': '#16a34a',
-    'violet-600': '#7c3aed',
-    'slate-600': '#475569',
-    'gray-600': '#4b5563',
-  };
-
-  const match = colorClass.match(/([a-z]+-\d+)/);
-  if (match) {
-    return colorMap[match[1]] || '#9333ea';
-  }
-  return '#9333ea';
-}

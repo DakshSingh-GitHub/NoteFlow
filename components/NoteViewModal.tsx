@@ -119,7 +119,7 @@ export default function NoteViewModal({ note, isOpen, onClose, onEdit }: NoteVie
 
                 <button
                   onClick={onClose}
-                  className="w-9 h-9 rounded-xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-white/70 hover:text-white hover:bg-white/[0.08] transition-all shrink-0"
+                  className="w-9 h-9 rounded-xl glass flex items-center justify-center text-white/70 hover:text-white transition-all shrink-0"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -153,7 +153,7 @@ export default function NoteViewModal({ note, isOpen, onClose, onEdit }: NoteVie
               <div className="flex flex-wrap gap-2 pt-4 mt-4 border-t border-white/[0.06]">
                 <button
                   onClick={handleEdit}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-medium transition-all"
+                  className="btn-primary flex items-center gap-2"
                 >
                   <Edit2 className="w-4 h-4" />
                   Edit
