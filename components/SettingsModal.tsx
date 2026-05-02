@@ -140,8 +140,10 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
             onClick={(e) => e.stopPropagation()}
             className="w-full max-w-2xl bg-[#0f0f14] rounded-2xl overflow-hidden border border-white/[0.08] shadow-2xl max-h-[85vh] flex flex-col"
           >
+            <div className="h-1.5 bg-gradient-to-r from-purple-600 to-violet-600" />
+
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
+            <div className="flex items-center justify-between px-6 py-5 border-b border-white/[0.06]">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-violet-600 flex items-center justify-center">
                   <Settings2 className="w-5 h-5 text-white" />
@@ -150,7 +152,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
               </div>
               <button
                 onClick={onClose}
-                className="w-8 h-8 rounded-lg bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.08] transition-all"
+                className="w-9 h-9 rounded-xl glass flex items-center justify-center text-white/50 hover:text-white transition-all"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -320,7 +322,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                     </div>
                     <button
                       onClick={handleExport}
-                      className="w-full px-4 py-2.5 rounded-xl bg-green-500/10 text-green-400 border border-green-500/20 hover:bg-green-500/20 transition-all flex items-center justify-center gap-2"
+                      className="w-full btn-secondary flex items-center justify-center gap-2"
                     >
                       <Download className="w-4 h-4" />
                       Export to JSON
@@ -338,7 +340,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                         <p className="text-white/40 text-sm">Restore notes from a backup file</p>
                       </div>
                     </div>
-                    <label className="w-full px-4 py-2.5 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20 hover:bg-blue-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer">
+                    <label className="w-full btn-secondary flex items-center justify-center gap-2 cursor-pointer">
                       <Upload className="w-4 h-4" />
                       Import from JSON
                       <input

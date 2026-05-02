@@ -50,7 +50,7 @@ export default function NoteGrid({ onEdit, onView }: NoteGridProps) {
         animate={{ opacity: 1, y: 0 }}
         className="flex flex-col items-center justify-center py-24 text-center"
       >
-        <div className="w-24 h-24 rounded-2xl bg-white/[0.03] border border-white/[0.08] flex items-center justify-center mb-6">
+        <div className="w-24 h-24 rounded-2xl glass flex items-center justify-center mb-6">
           {filters.searchQuery ? (
             <Search className="w-10 h-10 text-white/20" />
           ) : (
@@ -61,7 +61,7 @@ export default function NoteGrid({ onEdit, onView }: NoteGridProps) {
         <h3 className="text-xl font-semibold text-white mb-2">
           {filters.searchQuery ? 'No notes found' : 'No notes yet'}
         </h3>
-        <p className="text-white/40 max-w-sm text-sm">
+        <p className="text-white/40 max-w-sm text-sm leading-relaxed">
           {filters.searchQuery 
             ? `No notes matching "${filters.searchQuery}". Try a different search term.`
             : 'Get started by creating your first note. Click the + button below.'

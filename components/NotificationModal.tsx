@@ -130,8 +130,10 @@ export default function NotificationModal({ isOpen, onClose }: NotificationModal
             onClick={(e) => e.stopPropagation()}
             className="w-full max-w-lg bg-[#0f0f14] rounded-2xl overflow-hidden border border-white/[0.08] shadow-2xl max-h-[85vh] flex flex-col"
           >
+            <div className="h-1.5 bg-gradient-to-r from-purple-600 to-violet-600" />
+
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06] bg-white/[0.02]">
+            <div className="flex items-center justify-between px-6 py-5 border-b border-white/[0.06] bg-white/[0.02]">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-violet-600 flex items-center justify-center relative">
                   <Bell className="w-5 h-5 text-white" />
@@ -159,7 +161,7 @@ export default function NotificationModal({ isOpen, onClose }: NotificationModal
                 )}
                 <button
                   onClick={onClose}
-                  className="w-8 h-8 rounded-lg glass flex items-center justify-center text-white/50 hover:text-white transition-all"
+                  className="w-9 h-9 rounded-xl glass flex items-center justify-center text-white/50 hover:text-white transition-all"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -305,11 +307,11 @@ export default function NotificationModal({ isOpen, onClose }: NotificationModal
               {/* Empty State */}
               {notifications.length === 0 && (
                 <div className="flex flex-col items-center justify-center py-12 text-center">
-                  <div className="w-20 h-20 rounded-2xl glass flex items-center justify-center mb-4">
-                    <Sparkles className="w-8 h-8 text-white/20" />
+                  <div className="w-24 h-24 rounded-2xl glass flex items-center justify-center mb-6">
+                    <Sparkles className="w-10 h-10 text-white/20" />
                   </div>
-                  <h3 className="text-lg font-medium text-white mb-2">No events detected</h3>
-                  <p className="text-white/40 text-sm max-w-xs">
+                  <h3 className="text-xl font-semibold text-white mb-2">No events detected</h3>
+                  <p className="text-white/40 text-sm max-w-xs leading-relaxed">
                     Add dates to your notes like &quot;Meeting tomorrow at 3pm&quot; or &quot;Deadline: Jan 15&quot; and they&apos;ll appear here
                   </p>
                 </div>
