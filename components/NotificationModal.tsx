@@ -6,7 +6,6 @@ import {
   Bell, 
   Calendar, 
   Clock, 
-  Check,
   Trash2,
   AlertCircle,
   CalendarDays,
